@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-900">Admin Dashboard</h2>
+    <p class="text-gray-500 mt-1">Overview of portal statistics</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center hover:shadow-md transition-shadow">
+        <h3 class="text-gray-500 font-medium mb-2 text-sm uppercase tracking-wider">Total Events</h3>
+        <div class="text-4xl font-bold text-blue-600">{{ total_events }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center hover:shadow-md transition-shadow">
+        <h3 class="text-gray-500 font-medium mb-2 text-sm uppercase tracking-wider">Total Registrations</h3>
+        <div class="text-4xl font-bold text-blue-600">{{ total_registrations }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center hover:shadow-md transition-shadow">
+        <h3 class="text-gray-500 font-medium mb-2 text-sm uppercase tracking-wider">Total Participations</h3>
+        <div class="text-4xl font-bold text-blue-600">{{ total_participations }}</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center hover:shadow-md transition-shadow">
+        <h3 class="text-gray-500 font-medium mb-2 text-sm uppercase tracking-wider">Past Events</h3>
+        <div class="text-3xl font-bold text-gray-700">{{ past_events }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center hover:shadow-md transition-shadow border-l-4 border-green-500">
+        <h3 class="text-gray-500 font-medium mb-2 text-sm uppercase tracking-wider">Ongoing Events</h3>
+        <div class="text-3xl font-bold text-green-600">{{ ongoing_events }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center hover:shadow-md transition-shadow border-l-4 border-yellow-500">
+        <h3 class="text-gray-500 font-medium mb-2 text-sm uppercase tracking-wider">Upcoming Events</h3>
+        <div class="text-3xl font-bold text-yellow-600">{{ upcoming_events }}</div>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-xl font-bold text-gray-900">Recent Events</h3>
+        <a href="{{ url_for('admin_events') }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">Manage All &rarr;</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase text-xs">
+                <tr>
+                    <th class="px-6 py-3 font-semibold">Event Name</th>
+                    <th class="px-6 py-3 font-semibold">Category</th>
+                    <th class="px-6 py-3 font-semibold">Start Date</th>
+                    <th class="px-6 py-3 font-semibold">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for event in events[:5] %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">
+                        <a href="{{ url_for('event_analytics', event_id=event.event_id) }}" class="text-blue-600 hover:text-blue-800 hover:underline">
+                            {{ event.name }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4">{{ event.category }}</td>
+                    <td class="px-6 py-4">{{ event.start_date }}</td>
+                    <td class="px-6 py-4">
+                        {% if event.status == 'Ongoing' %}
+                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-md uppercase tracking-wider">Ongoing</span>
+                        {% elif event.status == 'Upcoming' %}
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-md uppercase tracking-wider">Upcoming</span>
+                        {% else %}
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md uppercase tracking-wider">{{ event.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">No events found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </table>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-8">
+    <div class="p-6 border-b border-gray-200">
+        <h3 class="text-xl font-bold text-gray-900">All Registrations</h3>
+        <p class="text-gray-500 text-sm mt-1">Detailed view of all student competition registrations</p>
+    </div>
+    <div class="overflow-x-auto max-h-96">
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase text-xs sticky top-0">
+                <tr>
+                    <th class="px-6 py-3 font-semibold">Student Name</th>
+                    <th class="px-6 py-3 font-semibold">USN</th>
+                    <th class="px-6 py-3 font-semibold">Department</th>
+                    <th class="px-6 py-3 font-semibold">Event</th>
+                    <th class="px-6 py-3 font-semibold">Competition</th>
+                    <th class="px-6 py-3 font-semibold">Date Registered</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for part in all_participations %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-bold text-gray-900">{{ part.participants.name }}</td>
+                    <td class="px-6 py-4">{{ part.participants.usn }}</td>
+                    <td class="px-6 py-4">{{ part.participants.department }} (Yr {{ part.participants.year }})</td>
+                    <td class="px-6 py-4">
+                        <a href="{{ url_for('event_analytics', event_id=part.competitions.event_id) }}" class="text-blue-600 hover:text-blue-800 hover:underline">
+                            {{ part.competitions.events.name }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4 font-medium">{{ part.competitions.name }}</td>
+                    <td class="px-6 py-4">{{ part.registration_date.split('T')[0] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">No registrations found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

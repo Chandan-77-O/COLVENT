@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Check USN{% endblock %}
+
+{% block content %}
+<div class="mb-8 max-w-2xl mx-auto mt-8">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900">Check USN</h2>
+        <p class="text-gray-500 mt-2">Look up any student's registration status by their USN</p>
+    </div>
+
+    <form method="POST" class="flex gap-4 mb-12">
+        <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" name="search_usn" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder-gray-400" placeholder="Enter USN (e.g. 1SI22CS001)" value="{{ searched_usn or '' }}" required>
+        </div>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-sm">
+            Search
+        </button>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for category, message in messages %}
+                    <div class="p-3 rounded-lg text-sm font-medium {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if search_result %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+            <div class="p-6 border-b border-gray-200 bg-gray-50">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xl">
+                        {{ search_result.student.name[0] }}
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">{{ search_result.student.name }}</h3>
+                        <p class="text-gray-500 text-sm">{{ search_result.student.usn }} &bull; {{ search_result.student.department }} &bull; Year {{ search_result.student.year }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            {% if search_result.participations %}
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-3 font-semibold">Competition</th>
+                        <th class="px-6 py-3 font-semibold">Event</th>
+                        <th class="px-6 py-3 font-semibold">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for part in search_result.participations %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-bold text-gray-900">{{ part.competitions.name }}</td>
+                        <td class="px-6 py-4">{{ part.competitions.events.name }}</td>
+                        <td class="px-6 py-4">
+                            {% if part.competitions.events.status == 'Ongoing' %}
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-md uppercase tracking-wider">Ongoing</span>
+                            {% elif part.competitions.events.status == 'Upcoming' %}
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-md uppercase tracking-wider">Upcoming</span>
+                            {% else %}
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md uppercase tracking-wider">{{ part.competitions.events.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="p-8 text-center text-gray-500">
+                This student has not registered for any competitions yet.
+            </div>
+            {% endif %}
+        </div>
+    {% elif not searched_usn %}
+        <div class="text-center mt-20">
+            <svg class="w-20 h-20 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <p class="text-gray-500 text-lg">Enter a USN above to check registration status</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

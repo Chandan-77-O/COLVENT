@@ -1,7 +1,0 @@
-Flask
-supabase
-pandas
-matplotlib
-python-dotenv
-psycopg2-binary
-gunicorn
